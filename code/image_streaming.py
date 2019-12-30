@@ -116,7 +116,7 @@ class BroadcastOutput(object):
     def write(self, b):
         self.latest = self.byteArrayToMat(b)
         if self.red_circle:
-            mat = self.latest.clone()
+            mat = self.latest.copy()
             cv2.circle(mat, (self.y, self.x), 10, (0, 0, 255, 0), 1)
             b = mat.flatten()
         self.converter.stdin.write(b)
@@ -129,7 +129,7 @@ class BroadcastOutput(object):
 
     @staticmethod
     def byteArrayToMat(b):
-        buffer = np.array(b)
+        buffer = np.frombuffer(b, dtype=np.uint8)
         image = buffer.reshape(HEIGHT, WIDTH, 4)
         return image
 

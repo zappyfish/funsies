@@ -126,14 +126,11 @@ class BroadcastOutput(object):
         self.converter.stdin.close()
         self.converter.wait()
 
+
     @staticmethod
     def byteArrayToMat(b):
-        B = b[::4]
-        G = b[1::4]
-        R = b[2::4]
-        A = b[3::4]
-
-        return np.dstack([B, G, R, A]).astype(np.uint8)
+        image = b.reshape(HEIGHT, WIDTH, 4)
+        return image
 
 class BroadcastThread(Thread):
     def __init__(self, converter, websocket_server):

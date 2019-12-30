@@ -206,6 +206,7 @@ class ImageStreamer:
 
     def stream_non_blocking(self):
         self.stream_thread = Thread(target=self.stream_blocking)
+        self.stream_thread.start()
 
     def end_stream_non_blocking(self):
         self.stream_thread.join()

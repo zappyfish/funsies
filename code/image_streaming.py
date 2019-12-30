@@ -148,13 +148,13 @@ class ImageStreamer:
 
     def __init__(self):
         self.stream_thread = None
-        with picamera.PiCamera() as self.camera:
-            self.camera.resolution = (WIDTH, HEIGHT)
-            self.camera.framerate = FRAMERATE
-            self.camera.vflip = VFLIP  # flips image rightside up, as needed
-            self.camera.hflip = HFLIP  # flips image left-right, as needed
-            sleep(1)  # camera warm-up time
-            self.output = BroadcastOutput(self.camera)
+        self.camera = picamera.PiCamera()
+        self.camera.resolution = (WIDTH, HEIGHT)
+        self.camera.framerate = FRAMERATE
+        self.camera.vflip = VFLIP  # flips image rightside up, as needed
+        self.camera.hflip = HFLIP  # flips image left-right, as needed
+        sleep(1)  # camera warm-up time
+        self.output = BroadcastOutput(self.camera)
 
     def add_red_circle(self, x, y):
         pass

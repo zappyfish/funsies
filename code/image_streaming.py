@@ -117,7 +117,7 @@ class BroadcastOutput(object):
         self.latest = self.byteArrayToMat(b)
         if self.red_circle:
             mat = self.latest.copy()
-            cv2.circle(mat, (self.y, self.x), 10, (0, 0, 255, 0), 1)
+            cv2.circle(mat, (self.x, self.y), 10, (0, 0, 255, 0), 1)
             b = mat.flatten()
         self.converter.stdin.write(b)
 

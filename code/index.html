@@ -43,12 +43,29 @@
     var client = new WebSocket('ws://' + window.location.hostname + ':${WS_PORT}/');
     var player = new jsmpeg(client, {canvas: canvas});
 
-    // Get canvas clicks
+    var url = "http://192.168.1.32:5000/click";
+
+    // Get coord of click on canvas, send as POST request
     function getCursorPosition(canvas, event) {
         const rect = canvas.getBoundingClientRect();
-        var x = event.clientX - rect.left;
-        var y = event.clientY - rect.top;
-        alert("click at " + x + "," + y);
+        var xPos = event.clientX - rect.left;
+        var yPos = event.clientY - rect.top;
+
+        (async () => {
+            const rawResponse = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({"x": xPos, "y": yPos})
+            });
+            const content = await rawResponse.json();
+
+            console.log(content);
+        })();
+
+        alert("post request sent?");
     }
 
     canvas.addEventListener('click', function (e) {

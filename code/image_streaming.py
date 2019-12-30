@@ -129,7 +129,8 @@ class BroadcastOutput(object):
 
     @staticmethod
     def byteArrayToMat(b):
-        image = b.reshape(HEIGHT, WIDTH, 4)
+        buffer = np.array(b)
+        image = buffer.reshape(HEIGHT, WIDTH, 4)
         return image
 
 class BroadcastThread(Thread):

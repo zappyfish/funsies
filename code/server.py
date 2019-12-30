@@ -22,9 +22,11 @@ def image_click():
 def main():
 
     image_streamer.stream_non_blocking()
+    image_streamer.add_red_circle(50, 50)
+    app.run()
+
     image_streamer.end_stream_non_blocking()
 
-    app.run()
 
 if __name__ == '__main__':
     main()

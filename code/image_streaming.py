@@ -90,6 +90,9 @@ class StreamingWebSocket(WebSocket):
 class BroadcastOutput(object):
     def __init__(self, camera):
         self.red_circle = False
+        self.x = 0
+        self.y = 0
+        self.latest = None
         print('Spawning background conversion process')
         self.converter = Popen([
             'ffmpeg',
@@ -105,9 +108,15 @@ class BroadcastOutput(object):
             stdin=PIPE, stdout=PIPE, stderr=io.open(os.devnull, 'wb'),
             shell=False, close_fds=True)
 
+    def set_red_circle(self, x, y):
+        self.x = x
+        self.y = y
+        self.red_circle = True
+
     def write(self, b):
+        self.latest = self.byteArrayToMat(b)
         if self.red_circle:
-            mat = self.byteArrayToMat(b)
+            mat = self.latest.clone()
             cv2.circle(mat, (self.y, self.x), 10, (0, 0, 255, 0), 1)
             b = mat.flatten()
         self.converter.stdin.write(b)
@@ -157,10 +166,10 @@ class ImageStreamer:
             self.output = BroadcastOutput(self.camera)
 
     def add_red_circle(self, x, y):
-        pass
+        self.output.set_red_circle(x, y)
 
     def get_latest_image(self):
-        pass
+        return self.output.latest
 
     def stream_blocking(self):
         print('Initializing websockets server on port %d' % WS_PORT)

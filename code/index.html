@@ -43,11 +43,12 @@
 		var player = new jsmpeg(client, {canvas:canvas});
 
 		// Get canvas clicks
-		canvas.addEventListener('click', function() {
-		var x = 0;
-		var y = 0;
-		alert("click at " + x + "," + y);
+		canvas.addEventListener('click', function(){
+			var x = canvas.clientX;
+    		var y = canvas.clientY;
+			alert("click at " + x + "," + y);
 		}, false);
+
 	</script>
 </body>
 </html>

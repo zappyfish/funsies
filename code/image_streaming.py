@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import cv2
 import sys
 import io
 import os
@@ -11,6 +12,7 @@ from threading import Thread
 from time import sleep, time
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from wsgiref.simple_server import make_server
+import numpy as np
 
 import picamera
 from ws4py.websocket import WebSocket
@@ -87,11 +89,12 @@ class StreamingWebSocket(WebSocket):
 
 class BroadcastOutput(object):
     def __init__(self, camera):
+        self.red_circle = False
         print('Spawning background conversion process')
         self.converter = Popen([
             'ffmpeg',
             '-f', 'rawvideo',
-            '-pix_fmt', 'yuv420p',
+            '-pix_fmt', 'bgra',
             '-s', '%dx%d' % camera.resolution,
             '-r', str(float(camera.framerate)),
             '-i', '-',
@@ -103,6 +106,10 @@ class BroadcastOutput(object):
             shell=False, close_fds=True)
 
     def write(self, b):
+        if self.red_circle:
+            mat = self.byteArrayToMat(b)
+            cv2.circle(mat, (self.y, self.x), 10, (0, 0, 255, 0), 1)
+            b = mat.flatten()
         self.converter.stdin.write(b)
 
     def flush(self):
@@ -110,6 +117,14 @@ class BroadcastOutput(object):
         self.converter.stdin.close()
         self.converter.wait()
 
+    @staticmethod
+    def byteArrayToMat(b):
+        B = b[::4]
+        G = b[1::4]
+        R = b[2::4]
+        A = b[3::4]
+
+        return np.dstack([B, G, R, A]).astype(np.uint8)
 
 class BroadcastThread(Thread):
     def __init__(self, converter, websocket_server):
@@ -163,7 +178,7 @@ class ImageStreamer:
         print('Initializing broadcast thread')
         broadcast_thread = BroadcastThread(self.output.converter, websocket_server)
         print('Starting recording')
-        self.camera.start_recording(self.output, 'yuv')
+        self.camera.start_recording(self.output, 'bgra')
         try:
             print('Starting websockets thread')
             websocket_thread.start()
